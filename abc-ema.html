@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABC-EMA Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="abc-ema-styles.css">
+</head>
+<body>
+
+  <!-- ============================================
+       AUTH CONTAINER (Login/Signup)
+       ============================================ -->
+  <div class="auth-container hidden">
+    <!-- Green Panel -->
+    <div class="green-panel">
+      <div class="circle circle-1"></div>
+      <div class="circle circle-2"></div>
+      <div class="circle circle-3"></div>
+      
+      <div class="logo">
+        <img src="logo.png" alt="ABC-EMA Logo">
+        <span>ABC-EMA</span>
+      </div>
+      
+      <div class="decor-rect"></div>
+      
+      <div class="welcome-section">
+        <h1>Welcome Back!</h1>
+        <p>To keep connected with us please login with your personal info</p>
+      </div>
+      
+      <button class="btn btn-panel" id="toggleToSignin">SIGN IN</button>
+    </div>
+
+    <!-- Forms Wrapper -->
+    <div class="forms-wrapper">
+      <!-- Signup Panel -->
+      <div class="signup-panel">
+        <h2 class="form-title">Create Account</h2>
+        <form class="form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" placeholder="Enter first name">
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" placeholder="Enter last name">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+              <label>Role</label>
+              <div class="dropdown-wrapper">
+                <div class="dropdown-selected">Select Role</div>
+                <div class="dropdown-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </div>
+                <div class="dropdown-options">
+                  <div class="dropdown-option" data-value="admin">Admin</div>
+                  <div class="dropdown-option" data-value="community">Community</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" placeholder="Enter password">
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" placeholder="Confirm password">
+            </div>
+          </div>
+          <div class="submit-container">
+            <button type="submit" class="btn btn-form">SIGN UP</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Signin Panel -->
+      <div class="signin-panel">
+        <h2 class="form-title">Sign In</h2>
+        <form class="form">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" placeholder="Enter password">
+          </div>
+          <div class="submit-container">
+            <button type="submit" class="btn btn-form">SIGN IN</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       ADMIN DASHBOARD
+       ============================================ -->
+  <div class="admin-dashboard active">
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <div class="menu-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+          </svg>
+        </div>
+        <div class="admin-logo">
+          <div class="logo-icon">
+            <img src="logo.png" alt="Logo">
+          </div>
+          <span class="logo-text">ABC<span class="green">-EMA</span></span>
+        </div>
+      </div>
+
+      <!-- Navigation - CENTERED -->
+      <nav class="admin-nav">
+        <a href="#" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          </svg>
+          Home
+        </a>
+        <a href="#" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20V10M18 20V4M6 20v-4"/>
+          </svg>
+          Analytics
+        </a>
+        <a href="#" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          Settings
+        </a>
+      </nav>
+
+      <div class="admin-header-right">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+        </div>
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notification-dot"></span>
+        </div>
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="admin-content">
+      <!-- Left Sidebar - Date Card with Gauge -->
+      <div class="left-sidebar">
+        <div class="date-card">
+          <!-- Header - stays at top -->
+          <div class="date-card-header">
+            <div class="date-info">
+              <span class="today-label">TODAY</span>
+              <h2 class="day-name" id="currentDay">Tuesday</h2>
+              <span class="date-text" id="currentDate">25 November</span>
+            </div>
+            <div class="info-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4"/>
+                <path d="M12 8h.01"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Gauge Section - VERTICALLY CENTERED -->
+          <div class="gauge-section">
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" viewBox="0 0 200 110">
+                <!-- Background Arc (gray) -->
+                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#E8E8E8" stroke-width="16" stroke-linecap="round"/>
+                <!-- Green Section (Good: 0-33%) -->
+                <path d="M 20 100 A 80 80 0 0 1 55 28" fill="none" stroke="#79E9B9" stroke-width="16" stroke-linecap="round"/>
+                <!-- Yellow Section (Moderate: 33-66%) -->
+                <path d="M 55 28 A 80 80 0 0 1 145 28" fill="none" stroke="#FED176" stroke-width="16" stroke-linecap="round"/>
+                <!-- Red Section (Poor: 66-100%) -->
+                <path d="M 145 28 A 80 80 0 0 1 180 100" fill="none" stroke="#FF7170" stroke-width="16" stroke-linecap="round"/>
+              </svg>
+              <div class="gauge-needle"></div>
+              <div class="gauge-center"></div>
+              <span class="gauge-label-left">0</span>
+              <span class="gauge-label-right">100</span>
+            </div>
+            <div class="gauge-value-display">
+              <span class="dot"></span>
+              <span class="value">26.7</span>
+              <span class="dot"></span>
+            </div>
+            <div class="gauge-status">Good</div>
+          </div>
+
+          <!-- Description - stays at bottom -->
+          <div class="gauge-description">
+            <p>All environmental parameters are within optimal ranges. The ABC-EMA system indicates stable and healthy conditions across all monitored factors.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content - Right Side -->
+      <div class="main-content">
+        <!-- Greeting -->
+        <div class="greeting-section">
+          <h1>Hello, <span class="highlight">LUCKY!</span></h1>
+          <div class="location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Brgy. Sto. Niño, Calapan City</span>
+          </div>
+        </div>
+
+        <!-- Sensor Cards -->
+        <div class="sensor-cards">
+          <!-- Water Quality Card -->
+          <div class="sensor-card">
+            <div class="sensor-icon water">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+              </svg>
+            </div>
+            <div class="sensor-data">
+              <span class="sensor-value">7.2 pH</span>
+              <span class="sensor-label">Water Quality</span>
+            </div>
+            <div class="sensor-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </div>
+            <div class="sensor-footer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4l3 3"/>
+              </svg>
+              <span>Updated 5 mins ago. pH levels are optimal for aquatic life.</span>
+            </div>
+          </div>
+
+          <!-- Air Quality Card -->
+          <div class="sensor-card">
+            <div class="sensor-icon air">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+              </svg>
+            </div>
+            <div class="sensor-data">
+              <span class="sensor-value">42 AQI</span>
+              <span class="sensor-label">Air Quality Index</span>
+            </div>
+            <div class="sensor-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </div>
+            <div class="sensor-footer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4l3 3"/>
+              </svg>
+              <span>Good air quality. Safe for outdoor activities.</span>
+            </div>
+          </div>
+
+          <!-- Temperature Card -->
+          <div class="sensor-card">
+            <div class="sensor-icon temp">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+              </svg>
+            </div>
+            <div class="sensor-data">
+              <span class="sensor-value">28°C</span>
+              <span class="sensor-label">Temperature</span>
+            </div>
+            <div class="sensor-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </div>
+            <div class="sensor-footer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4l3 3"/>
+              </svg>
+              <span>Normal temperature range for the region.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart Cards -->
+        <div class="charts-section">
+          <!-- Line Chart Card -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Environmental Trends</h3>
+            </div>
+            <div class="chart-body">
+              <div class="chart-area">
+                <svg class="line-chart" viewBox="0 0 300 100" preserveAspectRatio="none">
+                  <!-- Grid lines -->
+                  <line class="grid-line" x1="0" y1="25" x2="300" y2="25"/>
+                  <line class="grid-line" x1="0" y1="50" x2="300" y2="50"/>
+                  <line class="grid-line" x1="0" y1="75" x2="300" y2="75"/>
+                  <!-- Area fill -->
+                  <path class="chart-area-fill" d="M0,80 L50,60 L100,70 L150,40 L200,50 L250,30 L300,45 L300,100 L0,100 Z"/>
+                  <!-- Line -->
+                  <path class="chart-line" d="M0,80 L50,60 L100,70 L150,40 L200,50 L250,30 L300,45"/>
+                </svg>
+              </div>
+              <div class="chart-arrow-wrapper">
+                <div class="chart-arrow-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="chart-stats">
+              <span class="percentage">+12%</span>
+              <div class="stat-label">
+                <span class="stat-dot"></span>
+                <span>vs last week</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trends Chart Card -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Risk Analysis</h3>
+            </div>
+            <div class="chart-body">
+              <div class="chart-area">
+                <svg class="trends-chart" viewBox="0 0 300 100" preserveAspectRatio="none">
+                  <!-- Grid lines -->
+                  <line class="grid-line" x1="0" y1="25" x2="300" y2="25"/>
+                  <line class="grid-line" x1="0" y1="50" x2="300" y2="50"/>
+                  <line class="grid-line" x1="0" y1="75" x2="300" y2="75"/>
+                  <!-- Line -->
+                  <path class="trends-line" d="M0,70 L40,65 L80,55 L120,60 L160,45 L200,50 L240,35 L280,40 L300,30"/>
+                </svg>
+              </div>
+              <div class="chart-arrow-wrapper">
+                <div class="chart-arrow-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="chart-stats">
+              <span class="percentage">-8%</span>
+              <div class="stat-label">
+                <span class="stat-dot"></span>
+                <span>risk reduction</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       COMMUNITY DASHBOARD
+       ============================================ -->
+  <div class="community-dashboard">
+    <!-- Header -->
+    <div class="community-header">
+      <div class="logo-section">
+        <img src="logo.png" alt="Logo">
+        <div class="logo-text">
+          <h3>ABC-EMA</h3>
+          <span>Community Dashboard</span>
+        </div>
+      </div>
+      <div class="user-section">
+        <div class="user-info">
+          <h4>John Doe</h4>
+          <span class="community">Community Member</span>
+        </div>
+        <div class="user-avatar">JD</div>
+        <button class="logout-btn">Logout</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="community-content">
+      <!-- Emergency Card -->
+      <div class="community-card emergency-card">
+        <div class="card-header">
+          <h3>Emergency Alert</h3>
+        </div>
+        <button class="emergency-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          Report Emergency
+        </button>
+      </div>
+
+      <!-- Reports Card -->
+      <div class="community-card">
+        <div class="card-header">
+          <h3>My Reports</h3>
+          <div class="card-icon purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-value">12</div>
+        <div class="card-label">Total reports submitted</div>
+      </div>
+
+      <!-- Alerts Card -->
+      <div class="community-card">
+        <div class="card-header">
+          <h3>Active Alerts</h3>
+          <div class="card-icon orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-value">3</div>
+        <div class="card-label">Alerts in your area</div>
+      </div>
+
+      <!-- Status Card -->
+      <div class="community-card">
+        <div class="card-header">
+          <h3>Environment Status</h3>
+          <div class="card-icon purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-value" style="color: #79E9B9;">Good</div>
+        <div class="card-label">Overall environmental health</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Update current date
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const now = new Date();
+    
+    document.getElementById('currentDay').textContent = days[now.getDay()];
+    document.getElementById('currentDate').textContent = now.getDate() + ' ' + months[now.getMonth()];
+
+    // Toggle between sign-in and sign-up
+    const authContainer = document.querySelector('.auth-container');
+    const toggleBtn = document.getElementById('toggleToSignin');
+    
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        authContainer.classList.toggle('sign-in-mode');
+        toggleBtn.textContent = authContainer.classList.contains('sign-in-mode') ? 'SIGN UP' : 'SIGN IN';
+      });
+    }
+
+    // Dropdown functionality
+    document.querySelectorAll('.dropdown-wrapper').forEach(wrapper => {
+      const selected = wrapper.querySelector('.dropdown-selected');
+      const options = wrapper.querySelectorAll('.dropdown-option');
+      
+      selected.addEventListener('click', () => {
+        wrapper.classList.toggle('active');
+      });
+      
+      options.forEach(option => {
+        option.addEventListener('click', () => {
+          selected.textContent = option.textContent;
+          options.forEach(opt => opt.classList.remove('selected'));
+          option.classList.add('selected');
+          wrapper.classList.remove('active');
+        });
+      });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.dropdown-wrapper')) {
+        document.querySelectorAll('.dropdown-wrapper').forEach(wrapper => {
+          wrapper.classList.remove('active');
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
