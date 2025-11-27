@@ -2,69 +2,11 @@
 let usersDatabase = [];
 let currentUser = null;
 
-// Wait for DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize on page load
+window.onload = function() {
   initializeStorage();
   updateDateTime();
-  setupEventListeners();
-});
-
-function setupEventListeners() {
-  // Toggle button (Sign In / Sign Up)
-  const toggleBtn = document.getElementById('toggleBtn');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', toggleMode);
-  }
-
-  // Sign Up Form
-  const signupForm = document.getElementById('signupForm');
-  if (signupForm) {
-    signupForm.addEventListener('submit', handleSignup);
-  }
-
-  // Sign In Form
-  const signinForm = document.getElementById('signinForm');
-  if (signinForm) {
-    signinForm.addEventListener('submit', handleSignin);
-  }
-
-  // Dropdown
-  const dropdownSelected = document.getElementById('dropdownSelected');
-  if (dropdownSelected) {
-    dropdownSelected.addEventListener('click', toggleDropdown);
-  }
-
-  // Dropdown Options
-  const dropdownOptions = document.querySelectorAll('.dropdown-option');
-  dropdownOptions.forEach(function(option) {
-    option.addEventListener('click', function() {
-      selectOption(this);
-    });
-  });
-
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function(e) {
-    const dropdown = document.getElementById('roleDropdown');
-    if (dropdown && !dropdown.contains(e.target)) {
-      dropdown.classList.remove('active');
-    }
-  });
-
-  // Profile/Logout button in admin dashboard
-  const profileLogout = document.getElementById('profileLogout');
-  if (profileLogout) {
-    profileLogout.addEventListener('click', function(e) {
-      e.preventDefault();
-      logout();
-    });
-  }
-
-  // Logout button in community dashboard
-  const communityLogout = document.getElementById('communityLogout');
-  if (communityLogout) {
-    communityLogout.addEventListener('click', logout);
-  }
-}
+};
 
 function initializeStorage() {
   const storedUsers = localStorage.getItem('abcEmaUsers');
@@ -74,7 +16,6 @@ function initializeStorage() {
     usersDatabase = JSON.parse(storedUsers);
   }
   
-  // Check if user is already logged in
   if (storedCurrentUser) {
     currentUser = JSON.parse(storedCurrentUser);
     showDashboard(currentUser.role);
@@ -115,11 +56,6 @@ function toggleMode() {
   const panelTitle = document.getElementById('panelTitle');
   const panelText = document.getElementById('panelText');
   
-  if (!container || !toggleBtn || !panelTitle || !panelText) {
-    console.error('Required elements not found');
-    return;
-  }
-  
   toggleBtn.disabled = true;
   container.classList.toggle('sign-in-mode');
   
@@ -145,41 +81,32 @@ function toggleMode() {
 
 function toggleDropdown() {
   const dropdown = document.getElementById('roleDropdown');
-  if (dropdown) {
-    dropdown.classList.toggle('active');
-  }
+  dropdown.classList.toggle('active');
 }
 
-function selectOption(element) {
-  const value = element.getAttribute('data-value') || element.textContent;
-  const selectedRole = document.getElementById('selectedRole');
-  const roleInput = document.getElementById('role');
+function selectOption(element, value) {
+  document.getElementById('selectedRole').textContent = value;
+  document.getElementById('role').value = value;
   
-  if (selectedRole) {
-    selectedRole.textContent = value;
-  }
-  if (roleInput) {
-    roleInput.value = value;
-  }
-  
-  // Update selected state
   const options = document.querySelectorAll('.dropdown-option');
   options.forEach(function(opt) {
     opt.classList.remove('selected');
   });
   element.classList.add('selected');
   
-  // Close dropdown
+  document.getElementById('roleDropdown').classList.remove('active');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
   const dropdown = document.getElementById('roleDropdown');
-  if (dropdown) {
+  if (dropdown && !dropdown.contains(e.target)) {
     dropdown.classList.remove('active');
   }
-}
+});
 
 function shakeInvalidFields(formId) {
   const form = document.getElementById(formId);
-  if (!form) return;
-  
   const inputs = form.querySelectorAll('input[required]');
   
   inputs.forEach(function(input) {
@@ -192,9 +119,6 @@ function shakeInvalidFields(formId) {
   });
 }
 
-// ============================================
-// SIGN UP - Only registers user, then redirects to Sign In
-// ============================================
 function handleSignup(event) {
   event.preventDefault();
   
@@ -231,7 +155,7 @@ function handleSignup(event) {
     return;
   }
   
-  // Create new user (DO NOT log them in)
+  // Create new user
   const newUser = {
     id: Date.now(),
     username: username,
@@ -242,56 +166,37 @@ function handleSignup(event) {
     createdAt: new Date().toISOString()
   };
   
-  // Save to database only (not as current user)
+  // Save to database
   usersDatabase.push(newUser);
   saveUsers();
   
-  // Show success message on button
+  // Show success
   const btn = document.querySelector('#signupForm .btn-form');
-  if (btn) {
-    btn.innerHTML = '✓ REGISTERED';
-    btn.style.background = '#3DBE8A';
-    btn.style.borderColor = '#3DBE8A';
-    btn.style.color = '#ffffff';
-  }
+  btn.innerHTML = '✓ SUCCESS';
+  btn.style.background = '#3DBE8A';
+  btn.style.borderColor = '#3DBE8A';
+  btn.style.color = '#ffffff';
   
-  // After success, redirect to Sign In page
   setTimeout(function() {
     // Reset form
     document.getElementById('signupForm').reset();
     document.getElementById('selectedRole').textContent = 'Local Government Unit';
     document.getElementById('role').value = 'Local Government Unit';
+    btn.innerHTML = 'SIGN UP';
+    btn.style.background = 'transparent';
+    btn.style.borderColor = '#CCCCCC';
+    btn.style.color = '#999999';
     
-    // Reset dropdown selection
-    const options = document.querySelectorAll('.dropdown-option');
-    options.forEach(function(opt, index) {
-      if (index === 0) {
-        opt.classList.add('selected');
-      } else {
-        opt.classList.remove('selected');
-      }
-    });
+    // Switch to sign-in mode
+    document.getElementById('authContainer').classList.add('sign-in-mode');
+    document.getElementById('toggleBtn').textContent = 'SIGN UP';
+    document.getElementById('panelTitle').textContent = 'Hello, Friend!';
+    document.getElementById('panelText').textContent = 'Enter your personal account and start your journey with us.';
     
-    // Reset button
-    if (btn) {
-      btn.innerHTML = 'SIGN UP';
-      btn.style.background = 'transparent';
-      btn.style.borderColor = '#CCCCCC';
-      btn.style.color = '#999999';
-    }
-    
-    // Show success alert
-    alert('Account created successfully! Please sign in with your credentials.');
-    
-    // Switch to Sign In mode
-    toggleMode();
-    
+    alert('Account created successfully! Please sign in.');
   }, 1000);
 }
 
-// ============================================
-// SIGN IN - Authenticates user and redirects based on role
-// ============================================
 function handleSignin(event) {
   event.preventDefault();
   
@@ -304,7 +209,7 @@ function handleSignin(event) {
     return;
   }
   
-  // Find user in database
+  // Find user
   const user = usersDatabase.find(function(u) {
     return u.email === email && u.password === password;
   });
@@ -314,166 +219,697 @@ function handleSignin(event) {
     return;
   }
   
-  // Set as current user (NOW they are logged in)
+  // Set as current user
   currentUser = user;
   saveCurrentUser();
   
-  // Show success message on button
+  // Show success
   const btn = document.querySelector('#signinForm .btn-form');
-  if (btn) {
-    btn.innerHTML = '✓ SUCCESS';
-    btn.style.background = '#3DBE8A';
-    btn.style.borderColor = '#3DBE8A';
-    btn.style.color = '#ffffff';
-  }
+  btn.innerHTML = '✓ SUCCESS';
+  btn.style.background = '#3DBE8A';
+  btn.style.borderColor = '#3DBE8A';
+  btn.style.color = '#ffffff';
   
-  // Redirect to appropriate dashboard based on role
   setTimeout(function() {
+    showDashboard(user.role);
+    
     // Reset form
     document.getElementById('signinForm').reset();
-    
-    // Reset button
-    if (btn) {
-      btn.innerHTML = 'SIGN IN';
-      btn.style.background = 'transparent';
-      btn.style.borderColor = '#CCCCCC';
-      btn.style.color = '#999999';
-    }
-    
-    // Determine which dashboard to show based on user role
-    if (user.role === 'Local Government Unit') {
-      // Admin/LGU Dashboard
-      showDashboard('Local Government Unit');
-    } else {
-      // Community Member Dashboard
-      showDashboard('Community Member');
-    }
-    
+    btn.innerHTML = 'SIGN IN';
+    btn.style.background = 'transparent';
+    btn.style.borderColor = '#CCCCCC';
+    btn.style.color = '#999999';
   }, 1000);
 }
 
-// ============================================
-// SHOW DASHBOARD - Based on user role
-// ============================================
 function showDashboard(role) {
   // Hide auth container
-  const authContainer = document.getElementById('authContainer');
-  if (authContainer) {
-    authContainer.classList.add('hidden');
-  }
+  document.getElementById('authContainer').classList.add('hidden');
   
   // Hide all dashboards first
   const adminDashboard = document.getElementById('adminDashboard');
   const communityDashboard = document.getElementById('communityDashboard');
+  const analyticsDashboard = document.getElementById('analyticsDashboard');
   
-  if (adminDashboard) {
-    adminDashboard.classList.remove('active');
-  }
-  if (communityDashboard) {
-    communityDashboard.classList.remove('active');
-  }
+  if (adminDashboard) adminDashboard.classList.remove('active');
+  if (communityDashboard) communityDashboard.classList.remove('active');
+  if (analyticsDashboard) analyticsDashboard.classList.remove('active');
   
-  // Show appropriate dashboard based on role
   if (role === 'Local Government Unit') {
-    // ========== ADMIN DASHBOARD ==========
-    console.log('Showing Admin Dashboard for LGU user');
-    
-    if (adminDashboard) {
-      adminDashboard.classList.add('active');
-    }
-    
-    // Update admin name
-    const adminName = document.getElementById('adminName');
-    if (adminName && currentUser) {
-      adminName.textContent = currentUser.username.toUpperCase();
-    }
-    
-    // Update date and greeting
+    // Show admin dashboard
+    if (adminDashboard) adminDashboard.classList.add('active');
     updateDateTime();
     updateGreeting();
-    
   } else {
-    // ========== COMMUNITY DASHBOARD ==========
-    console.log('Showing Community Dashboard for Community Member');
-    
+    // Show community dashboard
     if (communityDashboard) {
       communityDashboard.classList.add('active');
-    }
-    
-    // Update community user info
-    const communityUsername = document.getElementById('communityUsername');
-    const communityAvatar = document.getElementById('communityAvatar');
-    
-    if (communityUsername && currentUser) {
-      communityUsername.textContent = currentUser.username;
-    }
-    if (communityAvatar && currentUser) {
-      communityAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+      document.getElementById('communityUsername').textContent = currentUser.username;
+      document.getElementById('communityAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
     }
   }
 }
 
-// ============================================
-// UPDATE GREETING - Filipino greeting based on time
-// ============================================
 function updateGreeting() {
   const hour = new Date().getHours();
-  let greeting = 'MAGANDANG UMAGA'; // Good Morning (default)
+  let greeting = 'Hello';
   
-  if (hour >= 12 && hour < 18) {
-    greeting = 'MAGANDANG HAPON'; // Good Afternoon
-  } else if (hour >= 18) {
-    greeting = 'MAGANDANG GABI'; // Good Evening
+  if (hour >= 5 && hour < 12) {
+    greeting = 'Good Morning';
+  } else if (hour >= 12 && hour < 18) {
+    greeting = 'Good Afternoon';
+  } else {
+    greeting = 'Good Evening';
   }
   
-  const greetingText = document.getElementById('greetingText');
-  
-  if (greetingText && currentUser) {
-    greetingText.innerHTML = greeting + ', <span class="name">' + currentUser.username.toUpperCase() + '</span>!';
+  const greetingElement = document.querySelector('.greeting-section h1');
+  if (greetingElement && currentUser) {
+    greetingElement.innerHTML = greeting + ', <span class="name">' + currentUser.username.toUpperCase() + '</span>!';
   }
 }
 
-// ============================================
-// LOGOUT - Clear session and return to login
-// ============================================
 function logout() {
-  // Clear current user
   currentUser = null;
   saveCurrentUser();
   
-  // Hide dashboards
+  // Hide all dashboards
   const adminDashboard = document.getElementById('adminDashboard');
   const communityDashboard = document.getElementById('communityDashboard');
+  const analyticsDashboard = document.getElementById('analyticsDashboard');
+  
+  if (adminDashboard) adminDashboard.classList.remove('active');
+  if (communityDashboard) communityDashboard.classList.remove('active');
+  if (analyticsDashboard) analyticsDashboard.classList.remove('active');
+  
+  // Show auth container in sign-in mode
   const authContainer = document.getElementById('authContainer');
-  
-  if (adminDashboard) {
-    adminDashboard.classList.remove('active');
-  }
-  if (communityDashboard) {
-    communityDashboard.classList.remove('active');
-  }
-  
-  // Show auth container (login/signup)
   if (authContainer) {
     authContainer.classList.remove('hidden');
-    // Make sure we're in sign-in mode after logout
     authContainer.classList.add('sign-in-mode');
   }
   
-  // Update panel text for sign-in mode
-  const toggleBtn = document.getElementById('toggleBtn');
-  const panelTitle = document.getElementById('panelTitle');
-  const panelText = document.getElementById('panelText');
-  
-  if (toggleBtn) {
-    toggleBtn.textContent = 'SIGN UP';
-  }
-  if (panelTitle) {
-    panelTitle.textContent = 'Hello, Friend!';
-  }
-  if (panelText) {
-    panelText.textContent = 'Enter your personal account and start your journey with us.';
+  // Reset panel text
+  document.getElementById('toggleBtn').textContent = 'SIGN UP';
+  document.getElementById('panelTitle').textContent = 'Hello, Friend!';
+  document.getElementById('panelText').textContent = 'Enter your personal account and start your journey with us.';
+}
+
+// Update showSection function (around line 330)
+function showSection(section, event) {
+  if (event) {
+    event.preventDefault();
   }
   
-  console.log('User logged out successfully');
+  // ✅ HIDE AUTH CONTAINER FIRST
+  const authContainer = document.getElementById('authContainer');
+  if (authContainer) {
+    authContainer.classList.add('hidden');
+    authContainer.style.display = 'none';
+    authContainer.style.visibility = 'hidden';
+    authContainer.style.opacity = '0';
+    authContainer.style.position = 'absolute';
+    authContainer.style.left = '-9999px';
+    authContainer.style.zIndex = '-1';
+  }
+  
+  const adminDashboard = document.getElementById('adminDashboard');
+  const analyticsDashboard = document.getElementById('analyticsDashboard');
+  const reportsDashboard = document.getElementById('reportsDashboard');
+  const profileDashboard = document.getElementById('profileDashboard');
+  const forecastDashboard = document.getElementById('forecastDashboard');
+  const alertsDashboard = document.getElementById('alertsDashboard');
+  
+  // Hide all sections
+  if (adminDashboard) {
+    adminDashboard.classList.remove('active');
+    adminDashboard.style.display = 'none';
+  }
+  if (analyticsDashboard) {
+    analyticsDashboard.classList.remove('active');
+    analyticsDashboard.style.display = 'none';
+  }
+  if (reportsDashboard) {
+    reportsDashboard.classList.remove('active');
+    reportsDashboard.style.display = 'none';
+  }
+  if (profileDashboard) {
+    profileDashboard.classList.remove('active');
+    profileDashboard.style.display = 'none';
+  }
+  if (forecastDashboard) {
+    forecastDashboard.classList.remove('active');
+    forecastDashboard.style.display = 'none';
+  }
+  if (alertsDashboard) {
+    alertsDashboard.classList.remove('active');
+    alertsDashboard.style.display = 'none';
+  }
+  
+  // ✅ Remove active class from ALL nav items in ALL headers
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  
+  // ✅ Add active class to corresponding nav items
+  if (section === 'home') {
+    if (adminDashboard) {
+      adminDashboard.style.display = 'block';
+      adminDashboard.classList.add('active');
+    }
+    // Add active to all "Home" nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+      if (item.textContent.trim().includes('Home') || item.textContent.trim().includes('Overview')) {
+        item.classList.add('active');
+      }
+    });
+  } else if (section === 'analytics') {
+    if (analyticsDashboard) {
+      analyticsDashboard.style.display = 'block';
+      analyticsDashboard.classList.add('active');
+    }
+    // Add active to all "Analytics" nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+      if (item.textContent.trim().includes('Analytics') || item.textContent.trim().includes('Analysis')) {
+        item.classList.add('active');
+      }
+    });
+  } else if (section === 'reports') {
+    if (reportsDashboard) {
+      reportsDashboard.style.display = 'block';
+      reportsDashboard.classList.add('active');
+    }
+    // Add active to all "Reports" nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+      if (item.textContent.trim().includes('Reports')) {
+        item.classList.add('active');
+      }
+    });
+  } else if (section === 'profile') {
+    if (profileDashboard) {
+      profileDashboard.style.display = 'block';
+      profileDashboard.classList.add('active');
+      updateProfileInfo();
+    }
+  } else if (section === 'forecast') {
+    if (forecastDashboard) {
+      forecastDashboard.style.display = 'block';
+      forecastDashboard.classList.add('active');
+    }
+  } else if (section === 'alerts') {
+    if (alertsDashboard) {
+      alertsDashboard.style.display = 'block';
+      alertsDashboard.classList.add('active');
+    }
+  }
+}
+
+function sidebarNavigate(section, event) {
+  if (event) {
+    event.preventDefault();
+  }
+  
+  // Remove active class from all sidebar items
+  document.querySelectorAll('.sidebar-menu-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  
+  // Add active class to clicked item
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  }
+  
+  // Navigate to section
+  if (section === 'home') {
+    showSection('home');
+    closeSidebar();
+  } else if (section === 'analytics') {
+    showSection('analytics');
+    closeSidebar();
+  } else if (section === 'reports') {
+    showSection('reports');
+    closeSidebar();
+  } else if (section === 'forecast') {
+    showSection('forecast');
+    closeSidebar();
+  } else if (section === 'alerts') {
+    showSection('alerts');
+    closeSidebar();
+  }
+}
+
+// Add new function for tab switching
+function switchProfileTab(tabName, event) {
+  event.preventDefault();
+  
+  // Remove active from all tabs
+  document.querySelectorAll('.profile-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Remove active from all panels
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+  
+  // Add active to clicked tab
+  event.currentTarget.classList.add('active');
+  
+  // Show corresponding panel
+  const panelId = tabName + '-panel';
+  const panel = document.getElementById(panelId);
+  if (panel) {
+    panel.classList.add('active');
+  }
+}
+
+// Add new function to update profile info
+function updateProfileInfo() {
+  if (!currentUser) return;
+  
+  // Update profile display
+  const avatarLarge = document.getElementById('profileAvatarLarge');
+  const fullName = document.getElementById('profileFullName');
+  const emailDisplay = document.getElementById('profileEmailDisplay');
+  const fullNameInput = document.getElementById('profileFullNameInput');
+  
+  if (avatarLarge) {
+    avatarLarge.textContent = currentUser.username.substring(0, 2).toUpperCase();
+  }
+  
+  if (fullName) {
+    fullName.textContent = currentUser.username;
+  }
+  
+  if (emailDisplay) {
+    emailDisplay.textContent = currentUser.email;
+  }
+  
+  if (fullNameInput) {
+    fullNameInput.value = currentUser.username;
+  }
+}
+
+// ============================================
+// SIDEBAR NAVIGATION
+// ============================================
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebarNav');
+  const overlay = document.getElementById('sidebarOverlay');
+  
+  sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
+  
+  // Update sidebar user info
+  if (currentUser && sidebar.classList.contains('active')) {
+    document.getElementById('sidebarAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
+    document.getElementById('sidebarUsername').textContent = currentUser.username;
+    document.getElementById('sidebarEmail').textContent = currentUser.email;
+  }
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById('sidebarNav');
+  const overlay = document.getElementById('sidebarOverlay');
+  
+  sidebar.classList.remove('active');
+  overlay.classList.remove('active');
+}
+
+function sidebarNavigate(section, event) {
+  if (event) {
+    event.preventDefault();
+  }
+  
+  // Remove active class from all sidebar items
+  document.querySelectorAll('.sidebar-menu-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  
+  // Add active class to clicked item
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  }
+  
+  // Navigate to section
+  if (section === 'home') {
+    showSection('home');
+    closeSidebar();
+  } else if (section === 'forecast') {
+    showSection('forecast');
+    closeSidebar();
+  } else if (section === 'alerts') {
+    showSection('alerts');  // ✅ NOW CALLS showSection PROPERLY
+    closeSidebar();
+  }
+}
+
+// Event Listeners
+document.getElementById('toggleBtn').addEventListener('click', toggleMode);
+document.getElementById('signupForm').addEventListener('submit', handleSignup);
+document.getElementById('signinForm').addEventListener('submit', handleSignin);
+
+
+// Community dashboard logout
+const communityLogoutBtn = document.getElementById('communityLogout');
+if (communityLogoutBtn) {
+  communityLogoutBtn.addEventListener('click', logout);
+}
+
+// Dropdown functionality
+const dropdownSelected = document.getElementById('dropdownSelected');
+if (dropdownSelected) {
+  dropdownSelected.addEventListener('click', toggleDropdown);
+}
+
+const dropdownOptions = document.querySelectorAll('.dropdown-option');
+dropdownOptions.forEach(function(option) {
+  option.addEventListener('click', function() {
+    selectOption(this, this.getAttribute('data-value'));
+  });
+});
+
+// Sidebar event listeners
+window.addEventListener('DOMContentLoaded', function() {
+  // Close button
+  const closeBtn = document.getElementById('sidebarClose');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeSidebar);
+  }
+  
+  // Overlay click
+  const overlay = document.getElementById('sidebarOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', closeSidebar);
+  }
+  
+  // Escape key to close
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeSidebar();
+    }
+  });
+});
+// ============================================
+// HEADER ICON INTERACTIONS
+// ============================================
+
+// ============================================
+// NOTIFICATION PANEL FUNCTIONS
+// ============================================
+
+function toggleNotifications() {
+  const panel = document.getElementById('notificationPanel');
+  const overlay = document.getElementById('notificationOverlay');
+  
+  panel.classList.toggle('active');
+  overlay.classList.toggle('active');
+  
+  // Prevent body scroll when panel is open
+  if (panel.classList.contains('active')) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+function closeNotifications() {
+  const panel = document.getElementById('notificationPanel');
+  const overlay = document.getElementById('notificationOverlay');
+  
+  panel.classList.remove('active');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function dismissNotification(button) {
+  const notificationItem = button.closest('.notification-item');
+  
+  // Animate out
+  notificationItem.style.transform = 'translateX(100%)';
+  notificationItem.style.opacity = '0';
+  
+  setTimeout(() => {
+    notificationItem.remove();
+    
+    // Update notification count
+    updateNotificationCount();
+  }, 300);
+}
+
+function updateNotificationCount() {
+  const remainingNotifications = document.querySelectorAll('.notification-item').length;
+  const subtitle = document.querySelector('.notification-subtitle');
+  
+  if (subtitle) {
+    subtitle.textContent = `You have ${remainingNotifications} new notification${remainingNotifications !== 1 ? 's' : ''}`;
+  }
+  
+  // Update notification dot
+  const notificationDots = document.querySelectorAll('.notification-dot');
+  notificationDots.forEach(dot => {
+    if (remainingNotifications === 0) {
+      dot.style.display = 'none';
+    } else {
+      dot.style.display = 'block';
+    }
+  });
+}
+
+// Close notification panel when pressing Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeNotifications();
+  }
+});
+
+// ============================================
+// FORECAST TAB SWITCHING - FIXED
+// ============================================
+
+function switchForecastTab(tabName, event) {
+  if (event) {
+    event.preventDefault();
+  }
+  
+  // Remove active class from all tabs
+  document.querySelectorAll('.forecast-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Add active to clicked tab
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  }
+  
+  // Hide all forecast sections
+  document.querySelectorAll('.forecast-section').forEach(section => {
+    section.classList.remove('active');
+  });
+  
+  // Show selected section
+  const sectionId = tabName + '-section';
+  const targetSection = document.getElementById(sectionId);
+  if (targetSection) {
+    targetSection.classList.add('active');
+  }
+  
+  console.log('Switched to forecast:', tabName);
+}
+
+// ============================================
+// ALERTS DASHBOARD FUNCTIONS
+// ============================================
+
+function filterAlerts(filter) {
+  // Remove active class from all tabs
+  document.querySelectorAll('.alerts-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Add active to clicked tab
+  event.currentTarget.classList.add('active');
+  
+  console.log('Filtering alerts:', filter);
+  // Add your filtering logic here
+}
+
+function toggleAllAlerts(checkbox) {
+  const checkboxes = document.querySelectorAll('.alerts-table tbody .table-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = checkbox.checked;
+  });
+}
+
+function openAddAlertModal() {
+  const modal = document.getElementById('alertModal');
+  const overlay = document.getElementById('alertModalOverlay');
+  
+  modal.classList.add('active');
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAddAlertModal() {
+  const modal = document.getElementById('alertModal');
+  const overlay = document.getElementById('alertModalOverlay');
+  
+  modal.classList.remove('active');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+  
+  // Reset form
+  document.getElementById('alertForm').reset();
+}
+
+function submitAlert(event) {
+  event.preventDefault();
+  
+  const title = document.getElementById('alertTitle').value;
+  const type = document.getElementById('alertType').value;
+  const message = document.getElementById('alertMessage').value;
+  const delivery = document.getElementById('alertDelivery').value;
+  
+  // Show success message
+  alert('Alert sent successfully!\n\nTitle: ' + title + '\nType: ' + type + '\nDelivery: ' + delivery);
+  
+  // Close modal
+  closeAddAlertModal();
+  
+  // Here you can add logic to add the alert to the table
+  console.log('Alert submitted:', { title, type, message, delivery });
+}
+
+// Close modal when pressing Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeAddAlertModal();
+  }
+});
+
+
+function expandSearch() {
+  // Find the search wrapper in the currently active dashboard
+  const activeDashboard = document.querySelector('.admin-dashboard.active, .analytics-dashboard.active, .reports-dashboard.active, .profile-dashboard.active, .forecast-dashboard.active, .alerts-dashboard.active');
+  
+  if (!activeDashboard) return;
+  
+  const wrapper = activeDashboard.querySelector('.header-search-wrapper');
+  const inputWrapper = activeDashboard.querySelector('.header-search-input-wrapper');
+  const input = activeDashboard.querySelector('.header-search-input');
+  
+  if (!wrapper || !inputWrapper || !input) return;
+  
+  wrapper.classList.add('expanded');
+  inputWrapper.classList.add('active');
+  
+  // Focus input after animation
+  setTimeout(() => {
+    input.focus();
+  }, 300);
+}
+
+function collapseSearch() {
+  // Find all active search wrappers and collapse them
+  document.querySelectorAll('.header-search-wrapper.expanded').forEach(wrapper => {
+    wrapper.classList.remove('expanded');
+  });
+  
+  document.querySelectorAll('.header-search-input-wrapper.active').forEach(inputWrapper => {
+    inputWrapper.classList.remove('active');
+    const input = inputWrapper.querySelector('.header-search-input');
+    if (input) input.value = '';
+  });
+}
+
+// Click outside to close - UPDATED
+document.addEventListener('click', function(e) {
+  const searchWrappers = document.querySelectorAll('.header-search-wrapper');
+  let clickedInsideSearch = false;
+  
+  searchWrappers.forEach(wrapper => {
+    if (wrapper.contains(e.target)) {
+      clickedInsideSearch = true;
+    }
+  });
+  
+  if (!clickedInsideSearch) {
+    collapseSearch();
+  }
+});
+
+// Close on Escape key - UPDATED
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    collapseSearch();
+  }
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  document.addEventListener('keypress', function(e) {
+    if (e.target.classList.contains('header-search-input') && e.key === 'Enter') {
+      const query = e.target.value.trim();
+      if (query) {
+        console.log('Searching for:', query);
+        alert('Searching for: ' + query);
+      }
+    }
+  });
+});
+
+// ============================================
+// EXCEL EXPORT FUNCTIONALITY
+// ============================================
+
+function exportReportsToExcel() {
+  // Get table data
+  const table = document.querySelector('.reports-table');
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  
+  // Prepare data for Excel
+  const excelData = [];
+  
+  // Add headers
+  excelData.push(['ID No.', 'Message', 'Category', 'Status', 'Created At']);
+  
+  // Add data rows
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    const rowData = [
+      cells[1].textContent.trim(), // ID no.
+      cells[2].textContent.trim(), // Message
+      cells[3].textContent.trim(), // Category
+      cells[4].textContent.trim(), // Status
+      cells[5].textContent.trim()  // Created at
+    ];
+    excelData.push(rowData);
+  });
+  
+  // Create workbook and worksheet
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(excelData);
+  
+  // Set column widths
+  ws['!cols'] = [
+    { wch: 10 },  // ID No.
+    { wch: 30 },  // Message
+    { wch: 20 },  // Category
+    { wch: 15 },  // Status
+    { wch: 20 }   // Created At
+  ];
+  
+  // Add worksheet to workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Reports');
+  
+  // Generate filename with current date
+  const today = new Date();
+  const filename = `ABC-EMA_Reports_${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}.xlsx`;
+  
+  // Save file
+  XLSX.writeFile(wb, filename);
+  
+  // Show success message
+  alert('✓ Reports exported successfully!');
 }
