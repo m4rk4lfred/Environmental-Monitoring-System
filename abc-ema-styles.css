@@ -2028,64 +2028,164 @@ body {
 }
 
 /* Mobile - Below 768px */
+/* Mobile - Below 768px */
 @media (max-width: 768px) {
   body {
     padding: 10px;
+    align-items: flex-start;
+    padding-top: 20px;
   }
 
-  /* ===== AUTH CONTAINER ===== */
+  /* ===== AUTH CONTAINER - MOBILE OPTIMIZED ===== */
   .auth-container {
     flex-direction: column;
     width: 100%;
+    max-width: 100%;
     min-height: auto;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    overflow: hidden;
   }
   
+  /* Green Panel - Top Section */
   .green-panel {
     width: 100%;
-    height: 220px;
-    border-radius: 25px 25px 0 0;
-    position: relative;
+    min-height: auto;
+    height: auto; /* ✅ CHANGED from 200px */
+    padding: 24px 20px; /* ✅ Better padding */
+    order: 1;
     transform: none !important;
+    border-radius: 20px 20px 0 0;
   }
   
   .auth-container.sign-in-mode .green-panel {
     transform: none !important;
-    border-radius: 25px 25px 0 0;
+    order: 1;
+    border-radius: 20px 20px 0 0;
   }
   
+  /* Hide decorative elements */
+  .circle,
+  .decor-rect {
+    display: none;
+  }
+  
+  /* Logo adjustments */
+  .logo {
+    margin-bottom: 16px;
+  }
+  
+  .logo img {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .logo span {
+    font-size: 16px;
+  }
+  
+  /* Welcome Section */
   .welcome-section {
+    padding: 0;
+    text-align: center;
     margin-top: 0;
   }
   
   .welcome-section h1 {
-    font-size: 22px;
+    font-size: 20px;
+    margin-bottom: 10px;
   }
   
   .welcome-section p {
-    font-size: 11px;
+    font-size: 12px;
+    max-width: 100%;
+    margin-bottom: 18px;
+    line-height: 1.5;
   }
   
+  /* Button Panel - Make fully visible */
   .btn-panel {
-    width: 140px;
-    margin-bottom: 20px;
+    width: 160px; /* ✅ Wider button */
+    font-size: 11px;
+    padding: 12px 0; /* ✅ Better padding */
+    margin: 0 auto 20px auto; /* ✅ Center with bottom margin */
   }
   
+  /* Forms Wrapper */
+  .forms-wrapper {
+    width: 100%;
+    min-height: auto;
+    order: 2;
+    background: #FFFFFF;
+  }
+  
+  .auth-container.sign-in-mode .forms-wrapper {
+    order: 2;
+  }
+  
+  /* Signup & Signin Panels - Full width */
   .signup-panel,
   .signin-panel {
     width: 100%;
+    min-height: auto;
+    padding: 30px 24px; /* ✅ Better padding */
+    position: relative;
     margin-left: 0;
-    padding: 30px 25px;
-    min-height: 400px;
   }
   
+  .auth-container.sign-in-mode .signup-panel {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .auth-container.sign-in-mode .signin-panel {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  /* Form Title */
   .form-title {
     font-size: 24px;
     margin-bottom: 25px;
   }
   
+  .signin-panel .form-title {
+    font-size: 22px;
+    margin-bottom: 30px;
+  }
+  
+  /* Form Rows - Stack vertically */
   .form-row {
     flex-direction: column;
     gap: 20px;
+  }
+  
+  .form-group label {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  
+  .form-group input,
+  .dropdown-selected {
+    font-size: 14px;
+    padding: 12px 0;
+  }
+  
+  .dropdown-selected {
+    padding: 12px 36px 12px 0;
+  }
+  
+  /* Submit Button */
+  .btn-form {
+    width: 180px; /* ✅ Wider button */
+    font-size: 11px;
+    padding: 12px 0;
+  }
+  
+  .submit-container {
+    margin-top: 24px;
   }
   
   /* ===== ADMIN DASHBOARD ===== */

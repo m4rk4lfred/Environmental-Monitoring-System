@@ -289,29 +289,79 @@ function updateGreeting() {
 }
 
 function logout() {
+  // Clear current user
   currentUser = null;
   saveCurrentUser();
+  
+  // Close sidebar first
+  closeSidebar();
   
   // Hide all dashboards
   const adminDashboard = document.getElementById('adminDashboard');
   const communityDashboard = document.getElementById('communityDashboard');
   const analyticsDashboard = document.getElementById('analyticsDashboard');
+  const reportsDashboard = document.getElementById('reportsDashboard');
+  const profileDashboard = document.getElementById('profileDashboard');
+  const forecastDashboard = document.getElementById('forecastDashboard');
+  const alertsDashboard = document.getElementById('alertsDashboard');
   
-  if (adminDashboard) adminDashboard.classList.remove('active');
-  if (communityDashboard) communityDashboard.classList.remove('active');
-  if (analyticsDashboard) analyticsDashboard.classList.remove('active');
+  if (adminDashboard) {
+    adminDashboard.classList.remove('active');
+    adminDashboard.style.display = 'none';
+  }
+  if (communityDashboard) {
+    communityDashboard.classList.remove('active');
+    communityDashboard.style.display = 'none';
+  }
+  if (analyticsDashboard) {
+    analyticsDashboard.classList.remove('active');
+    analyticsDashboard.style.display = 'none';
+  }
+  if (reportsDashboard) {
+    reportsDashboard.classList.remove('active');
+    reportsDashboard.style.display = 'none';
+  }
+  if (profileDashboard) {
+    profileDashboard.classList.remove('active');
+    profileDashboard.style.display = 'none';
+  }
+  if (forecastDashboard) {
+    forecastDashboard.classList.remove('active');
+    forecastDashboard.style.display = 'none';
+  }
+  if (alertsDashboard) {
+    alertsDashboard.classList.remove('active');
+    alertsDashboard.style.display = 'none';
+  }
   
   // Show auth container in sign-in mode
   const authContainer = document.getElementById('authContainer');
   if (authContainer) {
     authContainer.classList.remove('hidden');
     authContainer.classList.add('sign-in-mode');
+    authContainer.style.display = 'flex';
+    authContainer.style.visibility = 'visible';
+    authContainer.style.opacity = '1';
+    authContainer.style.position = 'relative';
+    authContainer.style.left = '0';
+    authContainer.style.zIndex = '1';
   }
   
+  
   // Reset panel text
-  document.getElementById('toggleBtn').textContent = 'SIGN UP';
-  document.getElementById('panelTitle').textContent = 'Hello, Friend!';
-  document.getElementById('panelText').textContent = 'Enter your personal account and start your journey with us.';
+  const toggleBtn = document.getElementById('toggleBtn');
+  const panelTitle = document.getElementById('panelTitle');
+  const panelText = document.getElementById('panelText');
+  
+  if (toggleBtn) toggleBtn.textContent = 'SIGN UP';
+  if (panelTitle) panelTitle.textContent = 'Hello, Friend!';
+  if (panelText) panelText.textContent = 'Enter your personal account and start your journey with us.';
+  
+  // Clear form inputs
+  const signinForm = document.getElementById('signinForm');
+  if (signinForm) signinForm.reset();
+  
+  console.log('User logged out successfully');
 }
 
 // Update showSection function (around line 330)
@@ -682,9 +732,55 @@ document.addEventListener('keydown', function(e) {
     closeNotifications();
   }
 });
+function goToForecast(sectionKey) {
+  // show forecast dashboard
+  showSection('forecast');
+
+  // after forecast dashboard is visible, switch tab
+  setTimeout(function () {
+    switchForecastTab(sectionKey);
+  }, 0);
+}
 
 // ============================================
 // FORECAST TAB SWITCHING - FIXED
+// ============================================
+function switchForecastTab(tabName, event) {
+  if (event) {
+    event.preventDefault();
+  }
+  
+  // Remove active class from all tabs
+  document.querySelectorAll('.forecast-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Add active to clicked tab
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  } else {
+    // called from goToForecast: activate tab by matching onclick
+    const tab = document.querySelector(`.forecast-tab[onclick*="'${tabName}'"]`);
+    if (tab) tab.classList.add('active');
+  }
+  
+  // Hide all forecast sections
+  document.querySelectorAll('.forecast-section').forEach(section => {
+    section.classList.remove('active');
+  });
+  
+  // Show selected section
+  const sectionId = tabName + '-section';
+  const targetSection = document.getElementById(sectionId);
+  if (targetSection) {
+    targetSection.classList.add('active');
+  }
+  
+  console.log('Switched to forecast:', tabName);
+}
+
+// ============================================
+// FORECAST TAB SWITCHING 
 // ============================================
 
 function switchForecastTab(tabName, event) {
