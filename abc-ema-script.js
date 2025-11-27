@@ -476,6 +476,7 @@ function showSection(section, event) {
 function sidebarNavigate(section, event) {
   if (event) {
     event.preventDefault();
+    event.stopPropagation();
   }
   
   // Remove active class from all sidebar items
@@ -488,23 +489,31 @@ function sidebarNavigate(section, event) {
     event.currentTarget.classList.add('active');
   }
   
-  // Navigate to section
-  if (section === 'home') {
-    showSection('home');
-    closeSidebar();
-  } else if (section === 'analytics') {
-    showSection('analytics');
-    closeSidebar();
-  } else if (section === 'reports') {
-    showSection('reports');
-    closeSidebar();
-  } else if (section === 'forecast') {
-    showSection('forecast');
-    closeSidebar();
-  } else if (section === 'alerts') {
-    showSection('alerts');
-    closeSidebar();
+  // Close sidebar first
+  closeSidebar();
+  
+  // Navigate to section based on which menu item was clicked
+  switch(section) {
+    case 'home':
+      showSection('home');
+      break;
+    case 'analytics':
+      showSection('analytics');
+      break;
+    case 'reports':
+      showSection('reports');
+      break;
+    case 'forecast':
+      showSection('forecast');
+      break;
+    case 'alerts':
+      showSection('alerts');
+      break;
+    default:
+      showSection('home');
   }
+  
+  console.log('Sidebar navigated to:', section);
 }
 
 // Add new function for tab switching
@@ -1009,3 +1018,270 @@ function exportReportsToExcel() {
   // Show success message
   alert('✓ Reports exported successfully!');
 }
+
+function updateCommunityDateTime() {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const now = new Date();
+  
+  const dayElement = document.getElementById('communityCurrentDay');
+  const dateElement = document.getElementById('communityCurrentDate');
+  
+  if (dayElement) {
+    dayElement.textContent = days[now.getDay()];
+  }
+  if (dateElement) {
+    dateElement.textContent = now.getDate().toString().padStart(2, '0') + ' ' + months[now.getMonth()];
+  }
+}
+
+function updateCommunityGreeting() {
+  const hour = new Date().getHours();
+  let greeting = 'MAGANDANG ARAW';
+  
+  if (hour >= 5 && hour < 12) {
+    greeting = 'MAGANDANG UMAGA';
+  } else if (hour >= 12 && hour < 18) {
+    greeting = 'MAGANDANG HAPON';
+  } else {
+    greeting = 'MAGANDANG GABI';
+  }
+  
+  const greetingElement = document.querySelector('.community-greeting h1');
+  if (greetingElement && currentUser) {
+    greetingElement.innerHTML = greeting + ', <span class="community-name">' + currentUser.username.toUpperCase() + '!</span>';
+  }
+}
+
+function toggleCommunitySidebar() {
+  toggleSidebar();
+}
+
+function expandCommunitySearch() {
+  // Reuse the existing search functionality
+  const activeDashboard = document.querySelector('.community-dashboard.active');
+  if (!activeDashboard) return;
+  
+  alert('Search functionality - Coming soon!');
+}
+
+function toggleCommunityNotifications() {
+  toggleNotifications();
+}
+
+function openReportModal() {
+  // Create and show report modal
+  let modal = document.getElementById('reportModal');
+  let overlay = document.getElementById('reportModalOverlay');
+  
+  if (!modal) {
+    // Create modal dynamically
+    const modalHTML = `
+      <div class="report-modal-overlay" id="reportModalOverlay" onclick="closeReportModal()"></div>
+      <div class="report-modal" id="reportModal">
+        <div class="report-modal-header">
+          <h2>File a Report</h2>
+          <button class="modal-close-btn" onclick="closeReportModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="report-modal-body">
+          <form class="report-form" id="reportForm" onsubmit="submitReport(event)">
+            <div class="report-form-group">
+              <label>Report Type</label>
+              <select id="reportType" required>
+                <option value="">Select type...</option>
+                <option value="Environmental Hazard">Environmental Hazard</option>
+                <option value="Water Quality Issue">Water Quality Issue</option>
+                <option value="Air Quality Concern">Air Quality Concern</option>
+                <option value="Temperature Anomaly">Temperature Anomaly</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            
+            <div class="report-form-group">
+              <label>Location</label>
+              <input type="text" id="reportLocation" placeholder="Enter location..." required>
+            </div>
+            
+            <div class="report-form-group">
+              <label>Description</label>
+              <textarea id="reportDescription" rows="4" placeholder="Describe the issue..." required></textarea>
+            </div>
+            
+            <div class="report-modal-footer">
+              <button type="button" class="btn-cancel" onclick="closeReportModal()">Cancel</button>
+              <button type="submit" class="btn-submit">Submit Report</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    modal = document.getElementById('reportModal');
+    overlay = document.getElementById('reportModalOverlay');
+  }
+  
+  modal.classList.add('active');
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeReportModal() {
+  const modal = document.getElementById('reportModal');
+  const overlay = document.getElementById('reportModalOverlay');
+  
+  if (modal) modal.classList.remove('active');
+  if (overlay) overlay.classList.remove('active');
+  document.body.style.overflow = '';
+  
+  // Reset form
+  const form = document.getElementById('reportForm');
+  if (form) form.reset();
+}
+
+function submitReport(event) {
+  event.preventDefault();
+  
+  const type = document.getElementById('reportType').value;
+  const location = document.getElementById('reportLocation').value;
+  const description = document.getElementById('reportDescription').value;
+  
+  // Show success message
+  alert('Report submitted successfully!\n\nType: ' + type + '\nLocation: ' + location);
+  
+  // Close modal
+  closeReportModal();
+  
+  console.log('Report submitted:', { type, location, description });
+}
+
+// Update showDashboard function to include community dashboard updates
+const originalShowDashboard = showDashboard;
+showDashboard = function(role) {
+  // Hide auth container
+  document.getElementById('authContainer').classList.add('hidden');
+  
+  // Hide all dashboards first
+  const adminDashboard = document.getElementById('adminDashboard');
+  const communityDashboard = document.getElementById('communityDashboard');
+  const analyticsDashboard = document.getElementById('analyticsDashboard');
+  
+  if (adminDashboard) adminDashboard.classList.remove('active');
+  if (communityDashboard) communityDashboard.classList.remove('active');
+  if (analyticsDashboard) analyticsDashboard.classList.remove('active');
+  
+  if (role === 'Local Government Unit') {
+    // Show admin dashboard
+    if (adminDashboard) adminDashboard.classList.add('active');
+    updateDateTime();
+    updateGreeting();
+  } else {
+    // Show community dashboard with new design
+    if (communityDashboard) {
+      communityDashboard.classList.add('active');
+      updateCommunityDateTime();
+      updateCommunityGreeting();
+    }
+  }
+};
+
+function toggleCommunitySidebar() {
+  const sidebar = document.getElementById('communitySidebarNav');
+  const overlay = document.getElementById('communitySidebarOverlay');
+  
+  if (sidebar && overlay) {
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+    
+    // Update user info in sidebar
+    if (currentUser && sidebar.classList.contains('active')) {
+      const avatar = document.getElementById('communitySidebarAvatar');
+      const username = document.getElementById('communitySidebarUsername');
+      const email = document.getElementById('communitySidebarEmail');
+      
+      if (avatar) avatar.textContent = currentUser.username.substring(0, 2).toUpperCase();
+      if (username) username.textContent = currentUser.username;
+      if (email) email.textContent = currentUser.email;
+    }
+    
+    // Prevent body scroll when sidebar is open
+    if (sidebar.classList.contains('active')) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+}
+
+function closeCommunitySidebar() {
+  const sidebar = document.getElementById('communitySidebarNav');
+  const overlay = document.getElementById('communitySidebarOverlay');
+  
+  if (sidebar) sidebar.classList.remove('active');
+  if (overlay) overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function communitySidebarNavigate(section, event) {
+  if (event) {
+    event.preventDefault();
+  }
+  
+  // Remove active class from all community menu items
+  document.querySelectorAll('.community-menu-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  
+  // Add active class to clicked item
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  }
+  
+  // Close the sidebar
+  closeCommunitySidebar();
+  
+  // Hide all community-related dashboards
+  const communityDashboard = document.getElementById('communityDashboard');
+  const communityForecastDashboard = document.getElementById('communityForecastDashboard');
+  
+  if (communityDashboard) communityDashboard.classList.remove('active');
+  if (communityForecastDashboard) communityForecastDashboard.classList.remove('active');
+  
+  // Navigate based on section
+  if (section === 'dashboard') {
+    if (communityDashboard) {
+      communityDashboard.classList.add('active');
+      updateCommunityDateTime();
+      updateCommunityGreeting();
+    }
+  } else if (section === 'forecast') {
+    if (communityForecastDashboard) {
+      communityForecastDashboard.classList.add('active');
+    }
+  } else if (section === 'reports') {
+    // Open the report modal and keep community dashboard visible
+    if (communityDashboard) communityDashboard.classList.add('active');
+    openReportModal();
+  }
+}
+
+// Add event listener for community sidebar overlay
+window.addEventListener('DOMContentLoaded', function() {
+  const communityOverlay = document.getElementById('communitySidebarOverlay');
+  if (communityOverlay) {
+    communityOverlay.addEventListener('click', closeCommunitySidebar);
+  }
+  
+  // Close community sidebar on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeCommunitySidebar();
+    }
+  });
+});
