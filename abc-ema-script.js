@@ -1788,3 +1788,141 @@ function performCommunitySearch(event) {
 function expandCommunitySearch() {
   toggleCommunitySearch();
 }
+
+function selectOption(element, value) {
+  document.getElementById('selectedRole').textContent = value;
+  document.getElementById('role').value = value;
+  
+  const options = document.querySelectorAll('.dropdown-option');
+  options.forEach(function(opt) {
+    opt.classList.remove('selected');
+  });
+  element.classList.add('selected');
+  
+  document.getElementById('roleDropdown').classList.remove('active');
+  
+  // ✅ Disable/Enable Role Code based on selection
+  const roleCodeInput = document.getElementById('roleCode');
+  if (value === 'Community Member') {
+    roleCodeInput.disabled = true;
+    roleCodeInput.value = '';
+    roleCodeInput.style.opacity = '0.5';
+    roleCodeInput.style.cursor = 'not-allowed';
+    roleCodeInput.style.backgroundColor = '#F5F5F5';
+  } else {
+    roleCodeInput.disabled = false;
+    roleCodeInput.style.opacity = '1';
+    roleCodeInput.style.cursor = 'text';
+    roleCodeInput.style.backgroundColor = '#FFFFFF';
+  }
+}
+
+// Valid Role Codes (LGU - Local Government Units)
+const VALID_ROLE_CODES = [
+  'LGU-CIT-2024-001',
+  'LGU-PRV-2024-002',
+  'LGU-MUN-2024-003',
+  'LGU-BRG-2024-004',
+  'LGU-ADM-2024-005',
+  'LGU-MON-2024-006',
+  'LGU-ENV-2024-007',
+  'LGU-DIS-2024-008',
+  'LGU-RSP-2024-009',
+  'LGU-OPS-2024-010'
+];
+
+function handleSignup(event) {
+  event.preventDefault();
+  
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const role = document.getElementById('role').value;
+  const roleCode = document.getElementById('roleCode').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  
+  // Validation
+  if (!username || !email || !password || !confirmPassword) {
+    shakeInvalidFields('signupForm');
+    return;
+  }
+  
+  // ✅ Validate Role Code for LGU only
+  if (role === 'Local Government Unit') {
+    if (!roleCode) {
+      alert('Role Code is required for LGU accounts!');
+      return;
+    }
+    
+    if (!VALID_ROLE_CODES.includes(roleCode)) {
+      alert('Invalid Role Code!');
+      return;
+    }
+  }
+  
+  if (password !== confirmPassword) {
+    alert('Passwords do not match!');
+    return;
+  }
+  
+  if (password.length < 8) {
+    alert('Password must be at least 8 characters!');
+    return;
+  }
+  
+  // Check if email already exists
+  const existingUser = usersDatabase.find(function(user) {
+    return user.email === email;
+  });
+  
+  if (existingUser) {
+    alert('An account with this email already exists!');
+    return;
+  }
+  
+  // Create new user
+  const newUser = {
+    id: Date.now(),
+    username: username,
+    email: email,
+    role: role,
+    roleCode: roleCode || 'N/A',
+    password: password,
+    createdAt: new Date().toISOString()
+  };
+  
+  // Save to database
+  usersDatabase.push(newUser);
+  saveUsers();
+  
+  // Show success
+  const btn = document.querySelector('#signupForm .btn-form');
+  btn.innerHTML = '✓ SUCCESS';
+  btn.style.background = '#3DBE8A';
+  btn.style.borderColor = '#3DBE8A';
+  btn.style.color = '#ffffff';
+  
+  setTimeout(function() {
+    // Reset form
+    document.getElementById('signupForm').reset();
+    document.getElementById('selectedRole').textContent = 'Local Government Unit';
+    document.getElementById('role').value = 'Local Government Unit';
+    document.getElementById('roleCode').disabled = false;
+    document.getElementById('roleCode').style.opacity = '1';
+    document.getElementById('roleCode').style.cursor = 'text';
+    document.getElementById('roleCode').style.backgroundColor = '#FFFFFF';
+    
+    btn.innerHTML = 'SIGN IN';
+    btn.style.background = 'transparent';
+    btn.style.borderColor = '#CCCCCC';
+    btn.style.color = '#999999';
+    
+    // Switch to sign-in mode
+    document.getElementById('authContainer').classList.add('sign-in-mode');
+    document.getElementById('toggleBtn').textContent = 'SIGN UP';
+    document.getElementById('panelTitle').textContent = 'Hello, Friend!';
+    document.getElementById('panelText').textContent = 'Enter your personal account and start your journey with us.';
+    
+    alert('Account created successfully! Please sign in.');
+  }, 1000);
+}
