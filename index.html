@@ -184,8 +184,8 @@
   <h2 class="form-title">Sign in to Abc-Ema</h2>
   <form class="form" id="signinForm">
     <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="signinEmail" placeholder="" required>
+      <label>Email or Username</label>
+      <input type="text" id="signinEmail" placeholder="" required>
     </div>
     <div class="form-group">
       <label>Password</label>
@@ -640,7 +640,7 @@
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M12 8v4l3 3"/>
               </svg>
-              <span>Good water level — perfect time to analyze trends or save baseline data.</span>
+              <span>Water Level (Normal) — Maintain regular monitoring schedules to ensure water levels remain stable and prepared for any sudden changes.</span>
             </div>
           </div>
 
@@ -3205,6 +3205,11 @@
     </div>
   </div>
 </div>
+
+<!-- ============================================
+     TOAST NOTIFICATION SYSTEM
+     ============================================ -->
+<div class="toast-container" id="toastContainer"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 

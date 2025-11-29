@@ -132,16 +132,30 @@ function handleSignup(event) {
   // Validation
   if (!username || !email || !password || !confirmPassword) {
     shakeInvalidFields('signupForm');
+    showError('Validation Error', 'Please fill in all required fields');
     return;
   }
   
+  // ✅ Validate Role Code for LGU only
+  if (role === 'Local Government Unit') {
+    if (!roleCode) {
+      showError('Role Code Required', 'Role Code is required for LGU accounts!');
+      return;
+    }
+    
+    if (!VALID_ROLE_CODES.includes(roleCode)) {
+      showError('Invalid Role Code', `Valid codes:\n${VALID_ROLE_CODES.join(', ')}`);
+      return;
+    }
+  }
+  
   if (password !== confirmPassword) {
-    alert('Passwords do not match!');
+    showError('Password Mismatch', 'Passwords do not match!');
     return;
   }
   
   if (password.length < 8) {
-    alert('Password must be at least 8 characters!');
+    showError('Weak Password', 'Password must be at least 8 characters!');
     return;
   }
   
@@ -151,7 +165,7 @@ function handleSignup(event) {
   });
   
   if (existingUser) {
-    alert('An account with this email already exists!');
+    showError('Email Exists', 'An account with this email already exists!');
     return;
   }
   
@@ -161,7 +175,7 @@ function handleSignup(event) {
     username: username,
     email: email,
     role: role,
-    roleCode: roleCode,
+    roleCode: roleCode || 'N/A',
     password: password,
     createdAt: new Date().toISOString()
   };
@@ -177,11 +191,18 @@ function handleSignup(event) {
   btn.style.borderColor = '#3DBE8A';
   btn.style.color = '#ffffff';
   
+  showSuccess('Account Created', 'Your account has been created successfully!');
+  
   setTimeout(function() {
     // Reset form
     document.getElementById('signupForm').reset();
     document.getElementById('selectedRole').textContent = 'Local Government Unit';
     document.getElementById('role').value = 'Local Government Unit';
+    document.getElementById('roleCode').disabled = false;
+    document.getElementById('roleCode').style.opacity = '1';
+    document.getElementById('roleCode').style.cursor = 'text';
+    document.getElementById('roleCode').style.backgroundColor = '#FFFFFF';
+    
     btn.innerHTML = 'SIGN UP';
     btn.style.background = 'transparent';
     btn.style.borderColor = '#CCCCCC';
@@ -192,8 +213,6 @@ function handleSignup(event) {
     document.getElementById('toggleBtn').textContent = 'SIGN UP';
     document.getElementById('panelTitle').textContent = 'Hello, Friend!';
     document.getElementById('panelText').textContent = 'Enter your personal account and start your journey with us.';
-    
-    alert('Account created successfully! Please sign in.');
   }, 1000);
 }
 
@@ -206,16 +225,17 @@ function handleSignin(event) {
   // Validation
   if (!email || !password) {
     shakeInvalidFields('signinForm');
+    showError('Missing Fields', 'Please enter email and password');
     return;
   }
   
   // Find user
   const user = usersDatabase.find(function(u) {
-    return u.email === email && u.password === password;
+    return(u.email === email && u.password === password) || (u.username === email && u.password === password)
   });
   
   if (!user) {
-    alert('Invalid email or password!');
+    showError('Login Failed', 'Invalid email or password!');
     return;
   }
   
@@ -229,6 +249,8 @@ function handleSignin(event) {
   btn.style.background = '#3DBE8A';
   btn.style.borderColor = '#3DBE8A';
   btn.style.color = '#ffffff';
+  
+  showSuccess('Login Successful', `Welcome back, ${user.username}!`);
   
   setTimeout(function() {
     showDashboard(user.role);
@@ -876,7 +898,7 @@ function submitAlert(event) {
   const delivery = document.getElementById('alertDelivery').value;
   
   // Show success message
-  alert('Alert sent successfully!\n\nTitle: ' + title + '\nType: ' + type + '\nDelivery: ' + delivery);
+  showSuccess('Alert Sent Successfully', `Alert "${title}" has been delivered via ${delivery}`);
   
   // Close modal
   closeAddAlertModal();
@@ -958,7 +980,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const query = e.target.value.trim();
       if (query) {
         console.log('Searching for:', query);
-        alert('Searching for: ' + query);
+        showInfo('Search', `Searching for "${query}"...`);
       }
     }
   });
@@ -1016,7 +1038,7 @@ function exportReportsToExcel() {
   XLSX.writeFile(wb, filename);
   
   // Show success message
-  alert('✓ Reports exported successfully!');
+  showSuccess('Export Complete', `Reports have been exported to ${filename}`);
 }
 
 function updateCommunityDateTime() {
@@ -1062,7 +1084,7 @@ function expandCommunitySearch() {
   const activeDashboard = document.querySelector('.community-dashboard.active');
   if (!activeDashboard) return;
   
-  alert('Search functionality - Coming soon!');
+  showInfo('Coming Soon', 'Search functionality will be available soon!');
 }
 
 function toggleCommunityNotifications() {
@@ -1153,7 +1175,7 @@ function submitReport(event) {
   const description = document.getElementById('reportDescription').value;
   
   // Show success message
-  alert('Report submitted successfully!\n\nType: ' + type + '\nLocation: ' + location);
+  showSuccess('Report Submitted', `Your ${type} report has been received from ${location}`);
   
   // Close modal
   closeReportModal();
@@ -1333,12 +1355,12 @@ function submitCommunityReport(event) {
   const message = document.getElementById('reportMessage').value;
   
   if (!category || !message) {
-    alert('Please fill in all required fields');
+    showError('Incomplete Report', 'Please select a category and provide a description');
     return;
   }
   
   // Show success message
-  alert('✓ Report submitted successfully!\n\nCategory: ' + category + '\n\nThank you for reporting this issue.');
+  showSuccess('Report Submitted Successfully', `Your ${category} report has been submitted. Thank you for your contribution!`);
   
   // Reset form
   document.getElementById('communityReportForm').reset();
@@ -1374,7 +1396,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (e.dataTransfer.files.length > 0) {
         fileInput.files = e.dataTransfer.files;
-        alert('Files selected: ' + fileInput.files.length);
+        showSuccess('Files Added', `${fileInput.files.length} file(s) selected successfully`);
       }
     });
   }
@@ -1850,23 +1872,23 @@ function handleSignup(event) {
   // ✅ Validate Role Code for LGU only
   if (role === 'Local Government Unit') {
     if (!roleCode) {
-      alert('Role Code is required for LGU accounts!');
+      showError('Role Code Required', 'Role Code is required for LGU accounts');
       return;
     }
     
     if (!VALID_ROLE_CODES.includes(roleCode)) {
-      alert('Invalid Role Code!');
+      showError('Invalid Role Code', `The code "${roleCode}" is not valid.`);
       return;
     }
   }
   
   if (password !== confirmPassword) {
-    alert('Passwords do not match!');
+    showError('Password Mismatch', 'Passwords do not match!');
     return;
   }
   
   if (password.length < 8) {
-    alert('Password must be at least 8 characters!');
+    showError('Weak Password', 'Password must be at least 8 characters!');
     return;
   }
   
@@ -1876,7 +1898,7 @@ function handleSignup(event) {
   });
   
   if (existingUser) {
-    alert('An account with this email already exists!');
+    showError('Email Already Exists', 'An account with this email already exists!');
     return;
   }
   
@@ -1923,6 +1945,64 @@ function handleSignup(event) {
     document.getElementById('panelTitle').textContent = 'Hello, Friend!';
     document.getElementById('panelText').textContent = 'Enter your personal account and start your journey with us.';
     
-    alert('Account created successfully! Please sign in.');
+    showSuccess('Account Created', 'Your account has been created successfully!');
   }, 1000);
+}
+
+// ============================================
+// TOAST NOTIFICATION SYSTEM
+// ============================================
+
+function showToast(title, message, type = 'success', duration = 3000) {
+  const container = document.getElementById('toastContainer');
+  
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  // Determine icon based on type
+  let icon = '✓';
+  if (type === 'error') icon = '✕';
+  if (type === 'warning') icon = '!';
+  if (type === 'info') icon = 'ℹ';
+  
+  toast.innerHTML = `
+    <div class="toast-icon">${icon}</div>
+    <div class="toast-content">
+      <p class="toast-title">${title}</p>
+      <p class="toast-message">${message}</p>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <div class="toast-progress"></div>
+  `;
+  
+  container.appendChild(toast);
+  
+  // Auto remove after duration
+  setTimeout(() => {
+    toast.style.animation = 'slideOutRight 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+}
+
+// Shortcut functions
+function showSuccess(title, message = '') {
+  showToast(title, message, 'success');
+}
+
+function showError(title, message = '') {
+  showToast(title, message, 'error');
+}
+
+function showWarning(title, message = '') {
+  showToast(title, message, 'warning');
+}
+
+function showInfo(title, message = '') {
+  showToast(title, message, 'info');
 }
