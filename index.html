@@ -355,8 +355,8 @@
               </svg>
             </div>
             <div class="sensor-data">
-              <span class="sensor-value">7.2 pH</span>
-              <span class="sensor-label">Water Quality</span>
+              <span class="sensor-value">1.8 m</span>
+              <span class="sensor-label">Water Level</span>
             </div>
             <div class="sensor-arrow" onclick="goToForecast('water-level')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -405,7 +405,7 @@
               </svg>
             </div>
             <div class="sensor-data">
-              <span class="sensor-value">28°C</span>
+              <span class="sensor-value">32.5°C</span>
               <span class="sensor-label">Temperature</span>
             </div>
             <div class="sensor-arrow" onclick="goToForecast('temperature')">
@@ -519,12 +519,12 @@
       </div>
 
       <div class="community-header-right">
-        <div class="header-icon" onclick="expandCommunitySearch()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="M21 21l-4.35-4.35"/>
-          </svg>
-        </div>
+<div class="header-icon" onclick="toggleCommunitySearch()" style="cursor: pointer;" title="Search">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="11" cy="11" r="8"/>
+    <path d="M21 21l-4.35-4.35"/>
+  </svg>
+</div>
         <div class="header-icon" onclick="toggleCommunityNotifications()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -2927,6 +2927,282 @@
       </svg>
       <span>Logout</span>
     </button>
+  </div>
+</div>
+
+<!-- ============================================
+     COMMUNITY REPORTS DASHBOARD
+     ============================================ -->
+<div class="community-reports-dashboard" id="communityReportsDashboard">
+  <!-- Header -->
+  <header class="community-header-new">
+    <div class="community-header-left">
+      <div class="menu-btn" onclick="toggleCommunitySidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+      </div>
+      <div class="community-logo">
+        <div class="logo-icon">
+          <img src="brandlogo.png" alt="Logo">
+        </div>
+        <span class="logo-text">ABC<span class="green">-EMA</span></span>
+      </div>
+    </div>
+
+    <div class="community-header-right">
+      <div class="header-icon" onclick="toggleCommunityNotifications()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="notification-dot"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="community-reports-content">
+    <!-- Left Sidebar - User Profile Card -->
+    <div class="community-reports-sidebar">
+      <div class="user-profile-card">
+        <h3 class="profile-card-title">User Profile</h3>
+        
+        <div class="profile-avatar-large">
+          <div class="avatar-circle" id="communityProfileAvatar">AJ</div>
+        </div>
+        
+        <h4 class="profile-name" id="communityProfileName">Alex Johnson</h4>
+        <p class="profile-designation">Regional Safety Coordinator</p>
+        
+        <div class="profile-details">
+          <div class="detail-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="detail-icon">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <span id="communityProfileEmail">alex.j@abcweb.com</span>
+          </div>
+          
+          <div class="detail-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="detail-icon">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <span>(555) 087-0000</span>
+          </div>
+          
+          <div class="detail-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="detail-icon">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+            <span>Executive Support</span>
+          </div>
+        </div>
+        
+        <button class="edit-profile-photo-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Edit Profile Photo
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Content - Report Form -->
+    <div class="community-reports-main">
+      <div class="report-form-card">
+        <!-- Tab Navigation -->
+        <div class="report-tabs">
+          <button class="report-tab active" onclick="switchReportTab('submit', event)">
+            Submit a Report
+          </button>
+          <button class="report-tab" onclick="switchReportTab('active', event)">
+            Active report
+          </button>
+        </div>
+
+        <!-- Submit Report Tab -->
+        <div class="report-tab-panel active" id="submit-report-panel">
+          <form class="report-form" id="communityReportForm" onsubmit="submitCommunityReport(event)">
+            <!-- Select Category -->
+            <div class="report-form-group">
+              <label class="form-label">Select Category</label>
+              <select id="reportCategory" class="form-select" required>
+                <option value="">Choose a report type...</option>
+                <option value="Water Quality">Water Quality Issue</option>
+                <option value="Air Quality">Air Quality Concern</option>
+                <option value="Temperature">Temperature Anomaly</option>
+                <option value="Environmental">Environmental Hazard</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <!-- Message or Description -->
+            <div class="report-form-group">
+              <label class="form-label">Message or Description</label>
+              <textarea id="reportMessage" class="form-textarea" placeholder="Describe the issue in detail..." rows="4" required></textarea>
+            </div>
+
+            <!-- Attach Photo or Video -->
+            <div class="report-form-group">
+              <label class="form-label">Attach Photo or Video (Optional)</label>
+              <div class="file-upload-area">
+                <div class="upload-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                </div>
+                <p class="upload-text">Drag files here or <span class="click-link">click to browse</span></p>
+                <p class="upload-subtext">Maximum 5 files (Photos or videos)</p>
+                <input type="file" id="reportFiles" class="file-input" multiple accept="image/*,video/*">
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-report-btn">Submit Report</button>
+          </form>
+        </div>
+
+        <!-- Active Report Tab -->
+<!-- Active Report Tab -->
+<div class="report-tab-panel" id="active-report-panel">
+  <div class="active-reports-list">
+    <!-- Report Item 1 -->
+    <div class="active-report-item">
+      <div class="report-item-header">
+        <div class="report-item-title">
+          <h4 class="report-title-text">Water Level Rise Alert</h4>
+          <span class="report-id">ID: #2024-001</span>
+        </div>
+        <span class="report-status-badge in-progress">In Progress</span>
+      </div>
+      
+      <div class="report-item-body">
+        <div class="report-info-row">
+          <span class="report-label">Category:</span>
+          <span class="report-value">Water Quality</span>
+        </div>
+        <div class="report-info-row">
+          <span class="report-label">Submitted:</span>
+          <span class="report-value">Nov 8, 2:30 PM</span>
+        </div>
+        <div class="report-info-row">
+          <span class="report-label">Description:</span>
+          <span class="report-value">River water level increased unexpectedly by 0.8 meters in 2 hours.</span>
+        </div>
+      </div>
+      
+      <div class="report-item-footer">
+        <button class="report-action-btn view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          View Details
+        </button>
+        <button class="report-action-btn update">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Update Status
+        </button>
+      </div>
+    </div>
+
+    <!-- Report Item 2 -->
+    <div class="active-report-item">
+      <div class="report-item-header">
+        <div class="report-item-title">
+          <h4 class="report-title-text">Air Quality Degradation</h4>
+          <span class="report-id">ID: #2024-002</span>
+        </div>
+        <span class="report-status-badge in-progress">In Progress</span>
+      </div>
+      
+      <div class="report-item-body">
+        <div class="report-info-row">
+          <span class="report-label">Category:</span>
+          <span class="report-value">Air Quality</span>
+        </div>
+        <div class="report-info-row">
+          <span class="report-label">Submitted:</span>
+          <span class="report-value">Nov 7, 10:15 AM</span>
+        </div>
+        <div class="report-info-row">
+          <span class="report-label">Description:</span>
+          <span class="report-value">PM2.5 levels spike detected in industrial zone. Readings exceed safe limits.</span>
+        </div>
+      </div>
+      
+      <div class="report-item-footer">
+        <button class="report-action-btn view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          View Details
+        </button>
+        <button class="report-action-btn update">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Update Status
+        </button>
+      </div>
+    </div>
+
+    <!-- Report Item 3 -->
+    <div class="active-report-item">
+      <div class="report-item-header">
+        <div class="report-item-title">
+          <h4 class="report-title-text">Temperature Anomaly Reported</h4>
+          <span class="report-id">ID: #2024-003</span>
+        </div>
+        <span class="report-status-badge pending">Pending Review</span>
+      </div>
+      
+      <div class="report-item-body">
+        <div class="report-info-row">
+          <span class="report-label">Category:</span>
+          <span class="report-value">Temperature</span>
+        </div>
+        <div class="report-info-row">
+          <span class="report-label">Submitted:</span>
+          <span class="report-value">Nov 6, 5:45 PM</span>
+        </div>
+        <div class="report-info-row">
+          <span class="report-label">Description:</span>
+          <span class="report-value">Unusual temperature drop observed. Readings dropped 8°C within 1 hour.</span>
+        </div>
+      </div>
+      
+      <div class="report-item-footer">
+        <button class="report-action-btn view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          View Details
+        </button>
+        <button class="report-action-btn update">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Update Status
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+      </div>
+    </div>
   </div>
 </div>
 

@@ -1249,9 +1249,11 @@ function communitySidebarNavigate(section, event) {
   // Hide all community-related dashboards
   const communityDashboard = document.getElementById('communityDashboard');
   const communityForecastDashboard = document.getElementById('communityForecastDashboard');
+  const communityReportsDashboard = document.getElementById('communityReportsDashboard');
   
   if (communityDashboard) communityDashboard.classList.remove('active');
   if (communityForecastDashboard) communityForecastDashboard.classList.remove('active');
+  if (communityReportsDashboard) communityReportsDashboard.classList.remove('active');
   
   // Navigate based on section
   if (section === 'dashboard') {
@@ -1265,9 +1267,14 @@ function communitySidebarNavigate(section, event) {
       communityForecastDashboard.classList.add('active');
     }
   } else if (section === 'reports') {
-    // Open the report modal and keep community dashboard visible
-    if (communityDashboard) communityDashboard.classList.add('active');
-    openReportModal();
+    if (communityReportsDashboard) {
+      communityReportsDashboard.classList.add('active');
+      if (currentUser) {
+        document.getElementById('communityProfileAvatar').textContent = currentUser.username.substring(0, 2).toUpperCase();
+        document.getElementById('communityProfileName').textContent = currentUser.username;
+        document.getElementById('communityProfileEmail').textContent = currentUser.email;
+      }
+    }
   }
 }
 
@@ -1285,3 +1292,499 @@ window.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+
+
+// ============================================
+// COMMUNITY REPORTS FUNCTIONS
+// ============================================
+
+function switchReportTab(tabName, event) {
+  if (event) {
+    event.preventDefault();
+  }
+  
+  // Remove active from all tabs
+  document.querySelectorAll('.report-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Remove active from all panels
+  document.querySelectorAll('.report-tab-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+  
+  // Add active to clicked tab
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  }
+  
+  // Show corresponding panel
+  const panelId = tabName + '-report-panel';
+  const panel = document.getElementById(panelId);
+  if (panel) {
+    panel.classList.add('active');
+  }
+}
+
+function submitCommunityReport(event) {
+  event.preventDefault();
+  
+  const category = document.getElementById('reportCategory').value;
+  const message = document.getElementById('reportMessage').value;
+  
+  if (!category || !message) {
+    alert('Please fill in all required fields');
+    return;
+  }
+  
+  // Show success message
+  alert('✓ Report submitted successfully!\n\nCategory: ' + category + '\n\nThank you for reporting this issue.');
+  
+  // Reset form
+  document.getElementById('communityReportForm').reset();
+  
+  console.log('Report submitted:', { category, message });
+}
+
+// File upload handling
+document.addEventListener('DOMContentLoaded', function() {
+  const fileUploadArea = document.querySelector('.file-upload-area');
+  const fileInput = document.getElementById('reportFiles');
+  
+  if (fileUploadArea && fileInput) {
+    fileUploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+    
+    fileUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileUploadArea.style.borderColor = '#79E9B9';
+      fileUploadArea.style.background = '#F0FFF9';
+    });
+    
+    fileUploadArea.addEventListener('dragleave', () => {
+      fileUploadArea.style.borderColor = '#D0D0D0';
+      fileUploadArea.style.background = '#FAFAFA';
+    });
+    
+    fileUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileUploadArea.style.borderColor = '#D0D0D0';
+      fileUploadArea.style.background = '#FAFAFA';
+      
+      if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        alert('Files selected: ' + fileInput.files.length);
+      }
+    });
+  }
+});
+
+// ============================================
+// COMMUNITY DASHBOARD SEARCH PANEL
+// ============================================
+
+function toggleCommunitySearch() {
+  const searchPanel = document.getElementById('communitySearchPanel');
+  const searchOverlay = document.getElementById('communitySearchOverlay');
+  
+  if (!searchPanel) {
+    createCommunitySearchPanel();
+    return;
+  }
+  
+  searchPanel.classList.toggle('active');
+  searchOverlay.classList.toggle('active');
+  
+  if (searchPanel.classList.contains('active')) {
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      const searchInput = document.getElementById('communitySearchInputMain');
+      if (searchInput) searchInput.focus();
+    }, 300);
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+function createCommunitySearchPanel() {
+  const searchHTML = `
+    <div class="search-overlay" id="communitySearchOverlay"></div>
+    <div class="search-panel" id="communitySearchPanel">
+      <div class="search-panel-header">
+        <h3>SEARCH</h3>
+        <button class="search-close" onclick="closeCommunitySearch()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="search-panel-body">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input type="text" id="communitySearchInputMain" class="search-input-main" placeholder="Search reports, forecasts, or alerts...">
+        </div>
+        
+        <div class="search-results" id="communitySearchResults">
+          <div style="padding: 20px; text-align: center; color: #999;">
+            <p>Search for reports, forecasts, weather alerts, or community data</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', searchHTML);
+  
+  // Add event listeners
+  document.getElementById('communitySearchOverlay').addEventListener('click', closeCommunitySearch);
+  document.getElementById('communitySearchInputMain').addEventListener('keyup', performCommunitySearch);
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeCommunitySearch();
+    }
+  });
+  
+  // Open the panel
+  const searchPanel = document.getElementById('communitySearchPanel');
+  const searchOverlay = document.getElementById('communitySearchOverlay');
+  searchPanel.classList.add('active');
+  searchOverlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  
+  document.getElementById('communitySearchInputMain').focus();
+}
+
+function closeCommunitySearch() {
+  const searchPanel = document.getElementById('communitySearchPanel');
+  const searchOverlay = document.getElementById('communitySearchOverlay');
+  
+  if (searchPanel) {
+    searchPanel.classList.remove('active');
+  }
+  if (searchOverlay) {
+    searchOverlay.classList.remove('active');
+  }
+  
+  document.body.style.overflow = '';
+}
+
+function performCommunitySearch(event) {
+  const query = event.target.value.trim().toLowerCase();
+  const resultsContainer = document.getElementById('communitySearchResults');
+  
+  if (!query) {
+    resultsContainer.innerHTML = `
+      <div style="padding: 20px; text-align: center; color: #999;">
+        <p>Search for reports, forecasts, weather alerts, or community data</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Sample search data
+  const searchableData = [
+    {
+      type: 'Report',
+      title: 'Water Level Rise Alert',
+      description: 'River water level increased unexpectedly by 0.8 meters',
+      id: '#2024-001',
+      category: 'Water Quality'
+    },
+    {
+      type: 'Report',
+      title: 'Air Quality Degradation',
+      description: 'PM2.5 levels spike detected in industrial zone',
+      id: '#2024-002',
+      category: 'Air Quality'
+    },
+    {
+      type: 'Forecast',
+      title: 'Temperature Forecast',
+      description: '7-Day temperature summary and trends',
+      category: 'Temperature'
+    },
+    {
+      type: 'Forecast',
+      title: 'Air Quality Forecast',
+      description: 'AQI assessment and pollutant breakdown',
+      category: 'Air Quality'
+    },
+    {
+      type: 'Alert',
+      title: 'Heatwave Spike Detected',
+      description: 'Outdoor temperature is rising rapidly',
+      category: 'Temperature'
+    },
+    {
+      type: 'Alert',
+      title: 'Water Level Stable',
+      description: 'River level remains at 2.8 meters',
+      category: 'Water Quality'
+    }
+  ];
+  
+  // Filter results based on query
+  const results = searchableData.filter(item => 
+    item.title.toLowerCase().includes(query) ||
+    item.description.toLowerCase().includes(query) ||
+    item.category.toLowerCase().includes(query)
+  );
+  
+  if (results.length === 0) {
+    resultsContainer.innerHTML = `
+      <div style="padding: 40px 20px; text-align: center; color: #999;">
+        <p>No results found for "<strong>${query}</strong>"</p>
+        <p style="font-size: 12px; margin-top: 10px;">Try searching for reports, forecasts, or alerts</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Display results
+  resultsContainer.innerHTML = results.map(result => `
+    <div style="padding: 16px; border-bottom: 1px solid #F0F0F0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#F8F9FA'" onmouseout="this.style.background='transparent'">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+        <h4 style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; color: #5F5C6D;">
+          ${result.title}
+        </h4>
+        <span style="font-size: 10px; padding: 3px 10px; border-radius: 4px; background: ${
+          result.type === 'Report' ? '#E3F2FD' :
+          result.type === 'Forecast' ? '#F0FFF4' :
+          '#FFF5F5'
+        }; color: ${
+          result.type === 'Report' ? '#42A5F5' :
+          result.type === 'Forecast' ? '#66BB6A' :
+          '#FF6B6B'
+        }; font-weight: 600;">
+          ${result.type}
+        </span>
+      </div>
+      
+      <p style="margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; font-size: 12px; color: #5F5C6D; opacity: 0.8; line-height: 1.4;">
+        ${result.description}
+      </p>
+      
+      <div style="display: flex; gap: 12px; font-size: 10px; color: #999; font-family: 'Poppins', sans-serif;">
+        <span style="background: #F0F0F0; padding: 2px 8px; border-radius: 4px;">
+          ${result.category}
+        </span>
+        ${result.id ? `<span>${result.id}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// Update the expandCommunitySearch function
+function expandCommunitySearch() {
+  toggleCommunitySearch();
+}
+
+// ============================================
+// COMMUNITY DASHBOARD SEARCH PANEL
+// ============================================
+
+function toggleCommunitySearch() {
+  const searchPanel = document.getElementById('communitySearchPanel');
+  const searchOverlay = document.getElementById('communitySearchOverlay');
+  
+  if (!searchPanel) {
+    createCommunitySearchPanel();
+    return;
+  }
+  
+  searchPanel.classList.toggle('active');
+  searchOverlay.classList.toggle('active');
+  
+  if (searchPanel.classList.contains('active')) {
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      const searchInput = document.getElementById('communitySearchInputMain');
+      if (searchInput) searchInput.focus();
+    }, 300);
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+function createCommunitySearchPanel() {
+  const searchHTML = `
+    <div class="search-overlay" id="communitySearchOverlay"></div>
+    <div class="search-panel" id="communitySearchPanel">
+      <div class="search-panel-header">
+        <h3>SEARCH</h3>
+        <button class="search-close" onclick="closeCommunitySearch()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="search-panel-body">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input type="text" id="communitySearchInputMain" class="search-input-main" placeholder="Search reports, forecasts, or alerts...">
+        </div>
+        
+        <div class="search-results" id="communitySearchResults">
+          <div style="padding: 20px; text-align: center; color: #999;">
+            <p>Search for reports, forecasts, weather alerts, or community data</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', searchHTML);
+  
+  // Add event listeners
+  document.getElementById('communitySearchOverlay').addEventListener('click', closeCommunitySearch);
+  document.getElementById('communitySearchInputMain').addEventListener('keyup', performCommunitySearch);
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeCommunitySearch();
+    }
+  });
+  
+  // Open the panel
+  const searchPanel = document.getElementById('communitySearchPanel');
+  const searchOverlay = document.getElementById('communitySearchOverlay');
+  searchPanel.classList.add('active');
+  searchOverlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  
+  document.getElementById('communitySearchInputMain').focus();
+}
+
+function closeCommunitySearch() {
+  const searchPanel = document.getElementById('communitySearchPanel');
+  const searchOverlay = document.getElementById('communitySearchOverlay');
+  
+  if (searchPanel) {
+    searchPanel.classList.remove('active');
+  }
+  if (searchOverlay) {
+    searchOverlay.classList.remove('active');
+  }
+  
+  document.body.style.overflow = '';
+}
+
+function performCommunitySearch(event) {
+  const query = event.target.value.trim().toLowerCase();
+  const resultsContainer = document.getElementById('communitySearchResults');
+  
+  if (!query) {
+    resultsContainer.innerHTML = `
+      <div style="padding: 20px; text-align: center; color: #999;">
+        <p>Search for reports, forecasts, weather alerts, or community data</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Sample search data
+  const searchableData = [
+    {
+      type: 'Report',
+      title: 'Water Level Rise Alert',
+      description: 'River water level increased unexpectedly by 0.8 meters',
+      id: '#2024-001',
+      category: 'Water Quality'
+    },
+    {
+      type: 'Report',
+      title: 'Air Quality Degradation',
+      description: 'PM2.5 levels spike detected in industrial zone',
+      id: '#2024-002',
+      category: 'Air Quality'
+    },
+    {
+      type: 'Forecast',
+      title: 'Temperature Forecast',
+      description: '7-Day temperature summary and trends',
+      category: 'Temperature'
+    },
+    {
+      type: 'Forecast',
+      title: 'Air Quality Forecast',
+      description: 'AQI assessment and pollutant breakdown',
+      category: 'Air Quality'
+    },
+    {
+      type: 'Alert',
+      title: 'Heatwave Spike Detected',
+      description: 'Outdoor temperature is rising rapidly',
+      category: 'Temperature'
+    },
+    {
+      type: 'Alert',
+      title: 'Water Level Stable',
+      description: 'River level remains at 2.8 meters',
+      category: 'Water Quality'
+    }
+  ];
+  
+  // Filter results based on query
+  const results = searchableData.filter(item => 
+    item.title.toLowerCase().includes(query) ||
+    item.description.toLowerCase().includes(query) ||
+    item.category.toLowerCase().includes(query)
+  );
+  
+  if (results.length === 0) {
+    resultsContainer.innerHTML = `
+      <div style="padding: 40px 20px; text-align: center; color: #999;">
+        <p>No results found for "<strong>${query}</strong>"</p>
+        <p style="font-size: 12px; margin-top: 10px;">Try searching for reports, forecasts, or alerts</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Display results
+  resultsContainer.innerHTML = results.map(result => `
+    <div style="padding: 16px; border-bottom: 1px solid #F0F0F0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#F8F9FA'" onmouseout="this.style.background='transparent'">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+        <h4 style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; color: #5F5C6D;">
+          ${result.title}
+        </h4>
+        <span style="font-size: 10px; padding: 3px 10px; border-radius: 4px; background: ${
+          result.type === 'Report' ? '#E3F2FD' :
+          result.type === 'Forecast' ? '#F0FFF4' :
+          '#FFF5F5'
+        }; color: ${
+          result.type === 'Report' ? '#42A5F5' :
+          result.type === 'Forecast' ? '#66BB6A' :
+          '#FF6B6B'
+        }; font-weight: 600;">
+          ${result.type}
+        </span>
+      </div>
+      
+      <p style="margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; font-size: 12px; color: #5F5C6D; opacity: 0.8; line-height: 1.4;">
+        ${result.description}
+      </p>
+      
+      <div style="display: flex; gap: 12px; font-size: 10px; color: #999; font-family: 'Poppins', sans-serif;">
+        <span style="background: #F0F0F0; padding: 2px 8px; border-radius: 4px;">
+          ${result.category}
+        </span>
+        ${result.id ? `<span>${result.id}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function expandCommunitySearch() {
+  toggleCommunitySearch();
+}
